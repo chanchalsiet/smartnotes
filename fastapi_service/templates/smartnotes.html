@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Notes</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <script src = "{{ url_for('static', filename = 'script.js' )}}"></script>
+</head>
+<body>
+<div class="container">
+    <h2>Smart Notes</h2>
+
+    <!-- Add Note -->
+    <form id="noteForm">
+        <input type="text" id="noteInput" placeholder="Write a new note..." required>
+        <button type="submit">Add Note</button>
+    </form>
+
+    <!-- Search Notes -->
+    <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="searchNotes()">
+
+    <!-- Notes List -->
+    <ul id="notesList">
+        <!-- Notes will appear here dynamically -->
+    </ul>
+</div>
+
+<script src="script.js"></script>

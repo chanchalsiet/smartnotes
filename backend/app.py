@@ -1,0 +1,132 @@
+from fastapi import FastAPI, Depends, HTTPException, Header, Response
+from sqlalchemy.orm import Session
+from database import SessionLocal, engine, Base
+from models import User
+from schemas import UserCreate, UpdateUser, UserLogin, NoteCreate, UpdateNotes
+import crud
+import auth
+from sqlalchemy import text
+from sqlalchemy import event
+app = FastAPI(title="SmartNotes API")
+
+def get_db():
+    db = SessionLocal()  # create a new sessionuvicorn backend.main:app --reload
+    try:
+        yield db          # provide session to route
+    finally:
+        db.close()
+
+@app.get("/")
+def home():
+    return {"message": "SmartNotes API Running"}
+
+@app.post("/login")
+def login(data: UserLogin,response: Response, db: Session = Depends(get_db)):
+    user = crud.get_user_by_email(db, data.email)
+    if not user or not auth.verify_password(user.password, data.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    token = auth.create_access_token(user.id)
+    # set response header
+    response.headers["Authorization"] = f"Bearer {token}"
+    return {"access_token": token, "token_type": "bearer"}
+
+@app.post("/register")
+def register(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(
+        (User.email == user.email) | (User.username == user.username)).first()
+    print(existing_user)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email or username already exists")
+    hashed_pw = auth.hash_password(user.password)
+
+    # Create user
+    new_user = User(
+        full_name=user.full_name,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        username=user.username,
+        email=user.email,
+        password=hashed_pw
+    )
+    print(new_user)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"status": "new_user","query": existing_user, "user_id": new_user.id}
+
+# @app.get("/users/profile")
+# def user_profile(user_id: int = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+#     user = crud.get_user(db, user_id)
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
+#     return {"status": "success", "user": user}
+@app.get("/users/profile")
+def user_profile(user_id: int = Depends(auth.get_current_user),db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    return user
+
+@app.post("/update_user/{user_id}")
+def update_user(user_id: int, user: UpdateUser,db: Session = Depends(get_db), user_logged: int = Depends(auth.get_current_user)):
+    # user_logged is the id extracted from JWT
+    db_user = crud.update_user(db, user_id, user)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"status": "success", "user": db_user}
+
+@app.delete("/delete_user/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db), user_logged: int = Depends(auth.get_current_user)):
+    db_user = crud.delete_user(db, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail = "User not found")
+    return {"status": "sucess", "message": f"User {user_id} deleted"}
+
+@app.delete("/delete_all_user")
+def delete_all_user(db: Session = Depends(get_db)):
+    count = crud.delete_all_user(db)
+    return {"status": "sucess", "message": f"Deleted {count} user(s)"}
+
+@app.get("/all_users")
+def get_all_user(db: Session = Depends(get_db)):
+    users = crud.get_all_users(db)
+    return {"status": "success", "users": users}
+
+# Create note
+# @app.post("/add_notes/{user_id}")
+# def add_notes(user_id: int, note: NoteCreate, db: Session = Depends(get_db)):
+#     return crud.create_note(db, note, user_id)
+
+@app.post("/add_notes")
+def add_notes(
+    note: NoteCreate,
+    user_id: int = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    return crud.create_note(db, note, user_id)
+@app.post("/edit_notes/{notes_id}")
+def edit_notes(notes_id: int, note: UpdateNotes, db: Session = Depends(get_db)):
+    db_notes = crud.update_notes(db, notes_id, note)
+    if not db_notes:
+        raise HTTPException(status_code=404, detail="note not found")
+    return {"status": "success", "note": db_notes}
+
+@app.get("/all_notes")
+def get_all_notes(db: Session = Depends(get_db)):
+    notes = crud.get_all_notes(db)
+    return {"status": "success", "users": notes}
+
+@app.post("/delete_notes/{notes_id}")
+def delete_notes(notes_id: int, db: Session = Depends(get_db)):
+    db_notes = crud.delete_notes(db, notes_id)
+    if not db_notes:
+        raise HTTPException(status_code=404, detail="notes not found")
+    return {"status": "sucess", "message": f"notes  {notes_id} deleted"}
+
+@app.post("/logout")
+def logout(Authorization: str = Header(None)):
+    if not Authorization:
+        raise HTTPException(status_code=401, detail="Missing token")
+    token = Authorization.split(" ")[1]
+    auth.logout_user(token)
+    return {"message": "Logged out successfully"}
