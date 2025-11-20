@@ -27,8 +27,21 @@ def login(data: UserLogin,response: Response, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = auth.create_access_token(user.id)
+    refresh_token = auth.create_access_token(user.id)
     # set response header
-    response.headers["Authorization"] = f"Bearer {token}"
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        samesite="strict"
+    )
+    # set refrence response header
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        samesite="strict"
+    )
     return {"access_token": token, "token_type": "bearer"}
 
 @app.post("/register")
@@ -56,12 +69,6 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     return {"status": "new_user","query": existing_user, "user_id": new_user.id}
 
-# @app.get("/users/profile")
-# def user_profile(user_id: int = Depends(auth.get_current_user), db: Session = Depends(get_db)):
-#     user = crud.get_user(db, user_id)
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return {"status": "success", "user": user}
 @app.get("/users/profile")
 def user_profile(user_id: int = Depends(auth.get_current_user),db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
@@ -122,11 +129,16 @@ def delete_notes(notes_id: int, db: Session = Depends(get_db)):
     if not db_notes:
         raise HTTPException(status_code=404, detail="notes not found")
     return {"status": "sucess", "message": f"notes  {notes_id} deleted"}
+#
+# @app.post("/logout")
+# def logout(Authorization: str = Header(None)):
+#     if not Authorization:
+#         raise HTTPException(status_code=401, detail="Missing token")
+#     token = Authorization.split(" ")[1]
+#     auth.logout_user(token)
+#     return {"message": "Logged out successfully"}
 
 @app.post("/logout")
-def logout(Authorization: str = Header(None)):
-    if not Authorization:
-        raise HTTPException(status_code=401, detail="Missing token")
-    token = Authorization.split(" ")[1]
-    auth.logout_user(token)
-    return {"message": "Logged out successfully"}
+def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"message": "Logged out"}
