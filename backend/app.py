@@ -5,10 +5,23 @@ from models import User
 from schemas import UserCreate, UpdateUser, UserLogin, NoteCreate, UpdateNotes
 import crud
 import auth
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy import event
 app = FastAPI(title="SmartNotes API")
 
+origins = [
+    "http://127.0.0.1:5500",  # frontend URL
+    "http://localhost:5500"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 def get_db():
     db = SessionLocal()  # create a new sessionuvicorn backend.main:app --reload
     try:
@@ -141,4 +154,5 @@ def delete_notes(notes_id: int, db: Session = Depends(get_db)):
 @app.post("/logout")
 def logout(response: Response):
     response.delete_cookie("access_token")
-    return {"message": "Logged out"}
+    response.delete_cookie("refresh_token")
+    return {"message": "Logged out succesfully"}

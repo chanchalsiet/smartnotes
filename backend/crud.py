@@ -21,15 +21,6 @@ def get_user_by_email(db: Session, email: str):
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
-# def update_user(db: Session, user_id: int, user_data: schemas.UserCreate):
-#     db_user = db.query(models.User).filter(models.User.id == user_id).first()
-#     if not db_user:
-#         None
-#     for key, value in user_data.dict().items():
-#         setattr(db_user, key, value)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
 
 def update_user(db: Session, user_id: int, user_data: schemas.UpdateUser):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -91,9 +82,6 @@ def delete_notes(db: Session , notes_id: int):
 
 def get_all_notes(db: Session):
     return db.query(models.Note).all()
-
-def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
 
 def get_notes_by_user(db: Session, user_id: int):
     return db.query(models.Note).filter(models.Note.user_id == user_id).all()

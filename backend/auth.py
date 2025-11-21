@@ -1,6 +1,6 @@
+from fastapi import HTTPException, Header, Request, Response
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from fastapi import HTTPException, Header, Request
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
 
@@ -60,15 +60,22 @@ def decode_token(token: str):
 #     return user_id
 def get_current_user(request: Request, response: Response):
     token = request.cookies.get("access_token")
-    if token:
-        try:
-
     print("COOKIE TOKEN =", token)
+
     if not token:
         raise HTTPException(status_code=401, detail="Missing token")
-    payload = decode_token(token)
+
+    try:
+        payload = decode_token(token)
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
     user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token payload")
+
     return user_id
+
 
 def create_refresh_token(user_id):
     expire = datetime.utcnow()+timedelta(days=7)
