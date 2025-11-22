@@ -11,7 +11,7 @@ from sqlalchemy import event
 app = FastAPI(title="SmartNotes API")
 
 origins = [
-    "http://127.0.0.1:5500",  # frontend URL
+    "http://127.0.0.1:5500",
     "http://localhost:5500"
 ]
 
@@ -19,7 +19,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["*"],   # allow all methods
     allow_headers=["*"],
 )
 def get_db():

@@ -44,3 +44,6 @@ which uvicorn
 uvicorn backend.main:app --reload
 python -m backend.main
 pip install PyJWT
+
+python3 -m http.server 5500
+pip install fastapi[all]
