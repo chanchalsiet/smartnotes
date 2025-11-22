@@ -1,0 +1,96 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f6fa;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h2 {
+    margin: 0;
+}
+
+header button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #4CAF50;
+    cursor: pointer;
+}
+
+header button:hover {
+    background-color: #f1f1f1;
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.add-note-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.noteTitle {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+textarea {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.notes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.note {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.note button {
+    margin-left: 5px;
+    background-color: #f44336;
+}
+
+.note button.edit {
+    background-color: #ff9800;
+}
+
+.note button:hover {
+    opacity: 0.8;
+}
