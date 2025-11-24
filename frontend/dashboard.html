@@ -6,7 +6,7 @@
   <title>Dashboard - Smart Notes</title>
   <link rel="stylesheet" href="/frontend/css/dashboard.css">
 </head>
-<body>
+<body class = "dashboard_page">
   <header>
     <h2>Welcome,</h2>
     <button id="logoutBtn">Logout</button>
@@ -14,11 +14,9 @@
 
   <main>
     <form id="addNoteForm">
-        <div class="add-note-container">
           <input type="text" id="noteTitle" class = "noteTitle" placeholder="Title" required />
-        </div>
-      <div class="add-note-container"><textarea id="newNote" placeholder="Write a new note..." required></textarea></div>
-      <div class="add-note-container"><button id="addNote">Add Note</button></div
+          <textarea id="newNote" placeholder="Write a new note..." required></textarea>
+          <button id="addNote">Add Note</button>
     </form>
 
     <div class="notes-container" id="notesList">
