@@ -2,10 +2,11 @@
 <html>
 <head>
     <title>Register</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/frontend/css/style.css">
 </head>
-<body>
+<body class="register">
     <h2>Register</h2>
+     <p class="error" id="errorMessage"></p>
     <form id="registerForm">
         <input type="text" id="full_name" placeholder="Full Name" required /><br>
         <input type="text" id="first_name" placeholder="First Name" required /><br>
@@ -16,6 +17,6 @@
         <button type="submit">Register</button>
     </form>
     <p id="error"></p>
-    <script src="js/main.js"></script>
+      <script src="/frontend/js/register.js"></script>
 </body>
 </html>

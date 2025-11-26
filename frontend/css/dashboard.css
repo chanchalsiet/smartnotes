@@ -90,52 +90,48 @@ main {
 }
 
 /* Notes Section */
-.notes-container {
-    margin-top: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* Single note card */
-.note {
-    background: #ffffff;
-    padding: 16px;
-    border-radius: 10px;
-    border-left: 6px solid #4CAF50;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
-
 /* Buttons area inside note */
 .note-buttons {
-    margin-top: 10px;
+    margin-top: 12px;
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
-/* Buttons in note */
+/* General button styling */
 .note-buttons button {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
+    padding: 8px 16px;
     font-size: 14px;
-    transition: 0.3s;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.note-buttons .edit {
-    background-color: #ff9800;
+/* Edit Button */
+.note-buttons #edit {
+    background: linear-gradient(135deg, #ffb74d, #ff9800);
 }
 
-.note-buttons .edit:hover {
-    background-color: #e68a00;
+.note-buttons #edit:hover {
+    background: linear-gradient(135deg, #ffa726, #f57c00);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.note-buttons .delete {
-    background-color: #f44336;
+/* Delete Button */
+.note-buttons #delete {
+    background: linear-gradient(135deg, #e57373, #f44336);
 }
 
-.note-buttons .delete:hover {
-    background-color: #d32f2f;
+.note-buttons #delete:hover {
+    background: linear-gradient(135deg, #ef5350, #d32f2f);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Optional: add smooth transition to inner text color */
+.note-buttons button span {
+    transition: color 0.3s ease;
 }

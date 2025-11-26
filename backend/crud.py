@@ -53,14 +53,18 @@ def delete_all_user(db:Session):
     db.commit()
     return deleted_count
 
+
 def get_all_users(db: Session):
     return db.query(models.User).all()
+
+
 def create_note(db: Session, note: schemas.NoteCreate, user_id: int):
-    db_note = models.Note(title=note.title, content=note.content, user_id=user_id)
+    db_note = models.Note(notes=note.note, user_id=user_id)
     db.add(db_note)
     db.commit()
     db.refresh(db_note)
     return db_note
+
 
 def update_notes(db: Session, notes_id: int, note_data: schemas.UpdateNotes):
     db_note = db.query(models.Note).filter(models.Note.id == notes_id).first()

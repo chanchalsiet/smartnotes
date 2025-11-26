@@ -8,14 +8,13 @@
 </head>
 <body class = "dashboard_page">
   <header>
-    <h2>Welcome,</h2>
-    <button id="logoutBtn">Logout</button>
+    <h2 id = "welcomeMessage" >Welcome,</h2>
+    <button id="logoutBtn" type="button" >Logout</button>
   </header>
 
   <main>
     <form id="addNoteForm">
-          <input type="text" id="noteTitle" class = "noteTitle" placeholder="Title" required />
-          <textarea id="newNote" placeholder="Write a new note..." required></textarea>
+          <textarea id="newNote" class = "newNote"  placeholder="Write a new note..." required></textarea>
           <button id="addNote">Add Note</button>
     </form>
 
@@ -23,6 +22,7 @@
       <!-- Notes will be displayed here dynamically -->
     </div>
   </main>
-  <script src="/frontend/js/dashboard.js"></script>
+
+<script src="/frontend/js/dashboard.js?v=001"></script>
 </body>
 </html>

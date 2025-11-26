@@ -9,10 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy import event
 app = FastAPI(title="SmartNotes API")
-
+import pdb
 origins = [
     "http://127.0.0.1:5500",
-    "http://localhost:5500"
+    "http://localhost:5500",
+    ""
 ]
 
 app.add_middleware(
@@ -22,19 +23,23 @@ app.add_middleware(
     allow_methods=["*"],   # allow all methods
     allow_headers=["*"],
 )
+
+
 def get_db():
-    db = SessionLocal()  # create a new sessionuvicorn backend.main:app --reload
+    db = SessionLocal()  # create a new session uvicorn backend.main:app --reload
     try:
         yield db          # provide session to route
     finally:
         db.close()
 
+
 @app.get("/")
 def home():
     return {"message": "SmartNotes API Running"}
 
+
 @app.post("/login")
-def login(data: UserLogin,response: Response, db: Session = Depends(get_db)):
+def login(data: UserLogin, response: Response, db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, data.email)
     if not user or not auth.verify_password(user.password, data.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -48,14 +53,15 @@ def login(data: UserLogin,response: Response, db: Session = Depends(get_db)):
         httponly=True,
         samesite="strict"
     )
-    # set refrence response header
+    # set reference response header
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
         samesite="strict"
     )
-    return {"access_token": token, "token_type": "bearer"}
+    return {"access_token": token,"token_type": "bearer", "username": user.username, "user_id": user.id}
+
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -82,10 +88,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     return {"status": "new_user","query": existing_user, "user_id": new_user.id}
 
+
 @app.get("/users/profile")
 def user_profile(user_id: int = Depends(auth.get_current_user),db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     return user
+
 
 @app.post("/update_user/{user_id}")
 def update_user(user_id: int, user: UpdateUser,db: Session = Depends(get_db), user_logged: int = Depends(auth.get_current_user)):
@@ -94,6 +102,7 @@ def update_user(user_id: int, user: UpdateUser,db: Session = Depends(get_db), us
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"status": "success", "user": db_user}
+
 
 @app.delete("/delete_user/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db), user_logged: int = Depends(auth.get_current_user)):
@@ -107,15 +116,12 @@ def delete_all_user(db: Session = Depends(get_db)):
     count = crud.delete_all_user(db)
     return {"status": "sucess", "message": f"Deleted {count} user(s)"}
 
+
 @app.get("/all_users")
 def get_all_user(db: Session = Depends(get_db)):
     users = crud.get_all_users(db)
     return {"status": "success", "users": users}
 
-# Create note
-# @app.post("/add_notes/{user_id}")
-# def add_notes(user_id: int, note: NoteCreate, db: Session = Depends(get_db)):
-#     return crud.create_note(db, note, user_id)
 
 @app.post("/add_notes")
 def add_notes(
@@ -123,7 +129,10 @@ def add_notes(
     user_id: int = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
+
     return crud.create_note(db, note, user_id)
+
+
 @app.post("/edit_notes/{notes_id}")
 def edit_notes(notes_id: int, note: UpdateNotes, db: Session = Depends(get_db)):
     db_notes = crud.update_notes(db, notes_id, note)
@@ -131,10 +140,11 @@ def edit_notes(notes_id: int, note: UpdateNotes, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="note not found")
     return {"status": "success", "note": db_notes}
 
+
 @app.get("/all_notes")
 def get_all_notes(db: Session = Depends(get_db)):
     notes = crud.get_all_notes(db)
-    return {"status": "success", "users": notes}
+    return {"notes": notes}
 
 @app.post("/delete_notes/{notes_id}")
 def delete_notes(notes_id: int, db: Session = Depends(get_db)):

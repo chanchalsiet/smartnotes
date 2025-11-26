@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
 class UserCreate(BaseModel):
     full_name: str
     first_name: str
@@ -8,6 +9,7 @@ class UserCreate(BaseModel):
     username: str
     email: str
     password: str
+
 
 class UpdateUser(BaseModel):
     full_name: Optional[str]
@@ -17,14 +19,16 @@ class UpdateUser(BaseModel):
     password: Optional[str]
     status: Optional[str]
 
+
 class UserLogin(BaseModel):
     email: str
     password: str
 
+
 class NoteCreate(BaseModel):
-    title: str
-    content: str
+    note: str
+
 
 class UpdateNotes(BaseModel):
-    title: str
-    content: str
+    notes: str
+
