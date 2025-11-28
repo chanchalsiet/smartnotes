@@ -146,6 +146,11 @@ def get_all_notes(db: Session = Depends(get_db)):
     notes = crud.get_all_notes(db)
     return {"notes": notes}
 
+@app.get("/all_notes_by_user")
+def get_notes_by_user( user_id: int = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+    notes = crud.get_notes_by_user(db, user_id)
+    return {"notes": notes}
+
 @app.post("/delete_notes/{notes_id}")
 def delete_notes(notes_id: int, db: Session = Depends(get_db)):
     db_notes = crud.delete_notes(db, notes_id)
