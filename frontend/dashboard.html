@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Smart Notes</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class = "dashboard_page">
+  <header>
+    <h2 id = "welcomeMessage" >Welcome,</h2>
+    <button id="logoutBtn" type="button" >Logout</button>
+  </header>
+
+  <main>
+    <form id="addNoteForm">
+          <textarea id="newNote" class = "newNote"  placeholder="Write a new note..." required></textarea>
+          <button id="addNote">Add Note</button>
+    </form>
+
+    <div class="notes-container" id="notesList">
+      <!-- Notes will be displayed here dynamically -->
+    </div>
+  </main>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>
+
+
