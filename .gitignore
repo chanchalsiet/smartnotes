@@ -1,0 +1,7 @@
+__pycache__
+*.pyc
+backend/.env
+venv
+.git
+node_modules
+.read.md
