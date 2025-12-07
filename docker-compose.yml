@@ -1,23 +1,9 @@
 version: "3.9"
 
 services:
-  api:
-    build: backend                # <-- path relative to docker-compose.yml
-    container_name: fastapi_app
-    ports:
-      - "8000:8000"                 # maps host:container
-    environment:
-      DATABASE_URL: "postgresql://postgres:postgres@db:5432/smartnotes"
-      SECRET_KEY: "mysecretjwtkey"  # better: use .env for secrets
-      ACCESS_TOKEN_EXPIRE_MINUTES: "60"
-    depends_on:
-      - db
-    volumes:
-      - ./backend:/app               # optional: mount source for live code changes
-    restart: unless-stopped
 
   db:
-    image: postgres
+    image: postgres:15
     container_name: smartnotes_db
     environment:
       POSTGRES_USER: chanchal
@@ -26,8 +12,37 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chanchal"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smartnotes_backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://chanchal:ramu123@db:5432/smartnotes
+      SECRET_KEY: mysecretjwtkey
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smartnotes_frontend
+    ports:
+      - "8080:80"
+    restart: always
 
 volumes:
-  pgdata:
+  postgres_data:

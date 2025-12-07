@@ -12,7 +12,8 @@ import auth
 from sqlalchemy import text
 from sqlalchemy import event
 app = FastAPI(title="SmartNotes API")
-app.mount("/frontend", StaticFiles(directory="../frontend", html=True), name="frontend")
+# app.mount("/frontend", StaticFiles(directory="frontend", html=True), name="frontend")
+
 import pdb
 origins = [
     "http://127.0.0.1:5500",

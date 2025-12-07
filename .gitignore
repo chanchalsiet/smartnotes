@@ -4,4 +4,4 @@ backend/.env
 venv
 .git
 node_modules
-.read.md
+test.md
