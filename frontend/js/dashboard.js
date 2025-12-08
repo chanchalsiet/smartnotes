@@ -51,7 +51,7 @@ function editNote(noteId) {
     renderNotes();
 
     const token = localStorage.getItem("token");
-    fetch(`http://0.0.0.0:8000/api/edit_notes/${noteId}`, {
+    fetch(`http://52.15.191.175:8000/api/edit_notes/${noteId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -78,7 +78,7 @@ function deleteNote(noteId) {
 
     // Send delete request to backend
     const token = localStorage.getItem("token");
-    fetch(`http://0.0.0.0:8000/api/delete_notes/${noteId}`, {
+    fetch(`http://52.15.191.175:8000/api/delete_notes/${noteId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -102,7 +102,7 @@ addNoteBtn.addEventListener("click", async (e) => {
         window.location.href = "login.html";
         return;
     }
-    const res = await fetch("http://0.0.0.0:8000/api/add_notes", {
+    const res = await fetch("http://52.15.191.175:8000/api/add_notes", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -129,7 +129,7 @@ addNoteBtn.addEventListener("click", async (e) => {
 // ------- Load Notes on Page Load -------- //
 async function loadNotes() {
     const token = localStorage.getItem("token");
-    const res = await fetch("http://0.0.0.0:8000/api/all_notes/", {
+    const res = await fetch("http://52.15.191.175:8000/api/all_notes/", {
         headers: {
             "Authorization": `Bearer ${token}`
         }

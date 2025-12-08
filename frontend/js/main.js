@@ -1,6 +1,6 @@
 
 //const API_URL = "http://13.58.138.43:8000/";
-const API_URL = "http://0.0.0.0:8000/api";
+const API_URL = "http://52.15.191.175:8000/api";
 document.querySelector("#loginForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.querySelector("#email").value;

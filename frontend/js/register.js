@@ -21,7 +21,7 @@ document.querySelector("#registerForm")?.addEventListener("submit", async (e) =>
         password
     };
     try {
-        const res = await fetch(`http://0.0.0.0:8000/api/register`, {
+        const res = await fetch(`http://52.15.191.175:8000/api/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
