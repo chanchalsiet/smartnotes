@@ -27,9 +27,8 @@ services:
     container_name: smartnotes_backend
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://chanchal:ramu123@db:5432/smartnotes
-      SECRET_KEY: mysecretjwtkey
+    env_file:
+      - ./backend/.env
     depends_on:
       db:
         condition: service_healthy
@@ -42,6 +41,8 @@ services:
     container_name: smartnotes_frontend
     ports:
       - "8080:80"
+    env_file:
+      - ./frontend/.env
     restart: always
 
 volumes:
