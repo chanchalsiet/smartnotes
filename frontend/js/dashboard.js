@@ -1,4 +1,4 @@
-
+import { API_URL } from './config.js';
 document.addEventListener("DOMContentLoaded", () => {
   const username = localStorage.getItem("username");
   if (username) {
@@ -23,6 +23,10 @@ let notes = [];
 // ------- Render Notes -------- //
 function renderNotes() {
     notesList.innerHTML = "";
+    if (notes.length === 0) {
+        notesList.innerHTML = "<p>No notes found.</p>";
+        return;
+    }
     notes.forEach(note => {
         const div = document.createElement("div");
         div.classList.add("note");
@@ -51,7 +55,7 @@ function editNote(noteId) {
     renderNotes();
 
     const token = localStorage.getItem("token");
-    fetch(`http://52.15.191.175:8000/api/edit_notes/${noteId}`, {
+    fetch(`${API_URL}/edit_notes/${noteId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -78,7 +82,7 @@ function deleteNote(noteId) {
 
     // Send delete request to backend
     const token = localStorage.getItem("token");
-    fetch(`http://52.15.191.175:8000/api/delete_notes/${noteId}`, {
+    fetch(`${API_URL}/delete_notes/${noteId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -89,12 +93,14 @@ function deleteNote(noteId) {
     .then(data => console.log("Note deleted:", data))
     .catch(err => console.error("Error deleting note:", err));
 }
-
+window.editNote = editNote;
+window.deleteNote = deleteNote;
 
 // ------- Add Note (SAVE IN DB) -------- //
 addNoteBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     const notesText = newNoteInput.value.trim();
+    if (!notesText) return;
     const token = localStorage.getItem("token");
     const user_id = localStorage.getItem("user_id");
     if (!token) {
@@ -102,7 +108,7 @@ addNoteBtn.addEventListener("click", async (e) => {
         window.location.href = "login.html";
         return;
     }
-    const res = await fetch("http://52.15.191.175:8000/api/add_notes", {
+    const res = await fetch(`${API_URL}/add_notes`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -128,15 +134,42 @@ addNoteBtn.addEventListener("click", async (e) => {
 
 // ------- Load Notes on Page Load -------- //
 async function loadNotes() {
-    const token = localStorage.getItem("token");
-    const res = await fetch("http://52.15.191.175:8000/api/all_notes/", {
-        headers: {
-            "Authorization": `Bearer ${token}`
+//    const token = localStorage.getItem("token");
+//    const res = await fetch("${API_URL}/all_notes/", {
+//        headers: {
+//            "Authorization": `Bearer ${token}`
+//        }
+//    });
+//    const data = await res.json();
+//    notes = Array.isArray(data) ? data : (data.users || data.notes);
+//    console.log("Notes loaded:", notes);
+//    renderNotes();
+    try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${API_URL}/all_notes`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        if (!res.ok) {
+            console.warn("API returned error:", res.status);
+            notes = [];
+            renderNotes();
+            return;
         }
-    });
-    const data = await res.json();
-    notes = Array.isArray(data) ? data : (data.users || data.notes);
-    console.log("Notes loaded:", notes);
-    renderNotes();
+        const data = await res.json();
+        notes = data?.notes || data?.users || [];
+        if (!Array.isArray(notes)) {
+            notes = [];
+        }
+        console.log("Notes loaded:", notes);
+        renderNotes();
+
+    } catch (error) {
+        console.error("Error loading notes:", error);
+        notes = [];
+        renderNotes();
+    }
 }
 loadNotes();
