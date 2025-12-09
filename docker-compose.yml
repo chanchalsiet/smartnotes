@@ -27,6 +27,8 @@ services:
     container_name: smartnotes_backend
     ports:
       - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
     env_file:
       - ./backend/.env
     depends_on:
