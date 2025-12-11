@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Header, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine, Base
+from database import SessionLocal, engine, Base, create_db_and_tables
 from models import User
 from schemas import UserCreate, UpdateUser, UserLogin, NoteCreate, UpdateNotes
 from fastapi.staticfiles import StaticFiles
@@ -32,7 +32,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
+@app.on_event("shutdown")
+async def shutdown_event():
+    print("App is shutting down!")
 def get_db():
     db = SessionLocal()  # create a new session uvicorn backend.main:app --reload
     try:
