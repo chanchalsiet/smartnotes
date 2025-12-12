@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const addNoteBtn = document.getElementById('addNote');
 const notesList = document.getElementById('notesList');
 const newNoteInput = document.getElementById('newNote');
+const fileInput = document.getElementById('noteFile');
 
 let notes = [];
 
@@ -33,6 +34,7 @@ function renderNotes() {
 
         div.innerHTML = `
             <p>${note.notes}</p>
+            ${note.file_path ? `<a href="${API_URL}/${note.file_path}" target="_blank">Download File</a>` : ""}
             <div class="note-buttons">
                 <button onclick="editNote(${note.id})">Edit</button>
                 <button onclick="deleteNote(${note.id})">Delete</button>
@@ -41,6 +43,7 @@ function renderNotes() {
         notesList.appendChild(div);
     });
 }
+
 function editNote(noteId) {
     const noteToEdit = notes.find(n => n.id === noteId);
     if (!noteToEdit) {
@@ -50,6 +53,9 @@ function editNote(noteId) {
 
     const newContent = prompt("Edit your note:", noteToEdit.notes);
     if (newContent === null) return; // User cancelled
+
+    const newFile = document.createElement("input");
+    newFile.type = "file";
 
     noteToEdit.notes = newContent;
     renderNotes();
@@ -109,28 +115,36 @@ addNoteBtn.addEventListener("click", async (e) => {
         window.location.href = "login.html";
         return;
     }
-    alert(API_URL)
-    const res = await fetch(`${API_URL}/add_notes`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ note: notesText })
-    });
-    if (res.status === 401) {
-        alert("Session expired. Login again.");
-        window.location.href = "login.html";
-        return;
+    const formData = new FormData();
+    formData.append("notes", notesText);
+    if (fileInput.files.length > 0) {
+        formData.append("file", fileInput.files[0]);
     }
-    const data = await res.json();
-    if (Array.isArray(notes)) {
+    try {
+        const res = await fetch(`${API_URL}/add_notes`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}` // Do NOT set Content-Type; browser will set it
+            },
+            body: formData
+        });
+
+        if (res.status === 401) {
+            alert("Session expired. Login again.");
+            return;
+        }
+
+        const data = await res.json();
         notes.push(data);
-    } else {
-        notes = [data];
+        renderNotes();
+        newNoteInput.value = "";
+        fileInput.value = "";
+    } catch (error) {
+        console.error("Error adding note:", error);
     }
 
     newNoteInput.value = "";
+
     renderNotes();
 });
 

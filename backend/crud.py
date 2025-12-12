@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 import models, schemas, auth
+from typing import Optional
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -59,8 +60,12 @@ def get_all_users(db: Session):
     return db.query(models.User).all()
 
 
-def create_note(db: Session, note: schemas.NoteCreate, user_id: int):
-    db_note = models.Note(notes=note.note, user_id=user_id)
+def create_note(db: Session, note_data: dict, user_id: int):
+    db_note = models.Note(
+        notes=note_data.get("notes"),
+        user_id=user_id,
+        file_path=note_data.get("file_path")
+    )
     db.add(db_note)
     db.commit()
     db.refresh(db_note)

@@ -27,6 +27,7 @@ class UserLogin(BaseModel):
 
 class NoteCreate(BaseModel):
     note: str
+    file_path: Optional[str] = None
 
 
 class UpdateNotes(BaseModel):

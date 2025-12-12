@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Header, Response
+from fastapi import FastAPI, Depends, HTTPException, Header, Response, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -6,13 +6,17 @@ from database import SessionLocal, engine, Base, create_db_and_tables
 from models import User
 from schemas import UserCreate, UpdateUser, UserLogin, NoteCreate, UpdateNotes
 from fastapi.staticfiles import StaticFiles
-import crud
-import auth
+from typing import Optional
+import shutil, os, uuid
+import crud, auth
 
 from sqlalchemy import text
 from sqlalchemy import event
 app = FastAPI(title="SmartNotes API")
 # app.mount("/frontend", StaticFiles(directory="frontend", html=True), name="frontend")
+
+UPLOAD_DIR = "uploaded_files"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 import pdb
 origins = [
@@ -140,13 +144,39 @@ def get_all_user(db: Session = Depends(get_db)):
     return {"status": "success", "users": users}
 
 
+# @app.post("/api/add_notes")
+# def add_notes(
+#     note: NoteCreate,
+#     user_id: int = Depends(auth.get_current_user),
+#     db: Session = Depends(get_db)
+# ):
+#     return crud.create_note(db, note, user_id)
+
 @app.post("/api/add_notes")
 def add_notes(
-    note: NoteCreate,
+    notes: str = Form(...),  # required note text
+    file: Optional[UploadFile] = File(None),  # optional file upload
     user_id: int = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
-    return crud.create_note(db, note, user_id)
+    file_path = None
+
+    # Save the file if uploaded
+    if file:
+        filename = f"{user_id}_{file.filename}"
+        file_location = os.path.join(UPLOAD_DIR, filename)
+        with open(file_location, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+        file_path = file_location
+
+    # Create note in DB
+    note_data = {
+        "notes": notes,      # matches your table column
+        "file_path": file_path
+    }
+
+    created_note = crud.create_note(db, note_data, user_id)
+    return created_note
 
 @app.post("/api/edit_notes/{notes_id}")
 def edit_notes(notes_id: int, note: UpdateNotes, db: Session = Depends(get_db)):

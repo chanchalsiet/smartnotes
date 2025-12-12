@@ -26,5 +26,6 @@ class Note(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    file_path = Column(String, nullable=True)
     owner = relationship("User", back_populates="notes")
 
