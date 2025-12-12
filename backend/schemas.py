@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class UserCreate(BaseModel):
@@ -33,3 +33,24 @@ class NoteCreate(BaseModel):
 class UpdateNotes(BaseModel):
     notes: str
 
+class NoteResponse(BaseModel):
+    id: int
+    notes: str
+    has_files: bool
+    files: List[FileResponse] = []
+
+    class Config:
+        orm_mode = True
+
+class FileBase(BaseModel):
+    filename: str
+    file_path: str
+
+class FileCreate(FileBase):
+    pass
+
+class FileOut(FileBase):
+    id: int
+    uploaded_at: datetime
+    class Config:
+        orm_mode = True

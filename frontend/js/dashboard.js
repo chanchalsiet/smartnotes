@@ -50,16 +50,12 @@ function editNote(noteId) {
         alert("Note not found!");
         return;
     }
-
     const newContent = prompt("Edit your note:", noteToEdit.notes);
     if (newContent === null) return; // User cancelled
-
     const newFile = document.createElement("input");
     newFile.type = "file";
-
     noteToEdit.notes = newContent;
     renderNotes();
-
     const token = localStorage.getItem("token");
     fetch(`${API_URL}/edit_notes/${noteId}`, {
         method: "POST",
@@ -108,7 +104,6 @@ addNoteBtn.addEventListener("click", async (e) => {
     const notesText = newNoteInput.value.trim();
     if (!notesText) return;
     const token = localStorage.getItem("token");
-    alert(token)
     const user_id = localStorage.getItem("user_id");
     if (!token) {
         alert("Please login again.");
@@ -128,12 +123,10 @@ addNoteBtn.addEventListener("click", async (e) => {
             },
             body: formData
         });
-
         if (res.status === 401) {
             alert("Session expired. Login again.");
             return;
         }
-
         const data = await res.json();
         notes.push(data);
         renderNotes();
@@ -142,9 +135,7 @@ addNoteBtn.addEventListener("click", async (e) => {
     } catch (error) {
         console.error("Error adding note:", error);
     }
-
     newNoteInput.value = "";
-
     renderNotes();
 });
 
@@ -161,8 +152,7 @@ async function loadNotes() {
 //    console.log("Notes loaded:", notes);
 //    renderNotes();
     try {
-        const token = localStorage.getItem("token");
-
+        const token = localStorage.getItem("token")
         const res = await fetch(`${API_URL}/all_notes`, {
             headers: {
                 "Authorization": `Bearer ${token}`

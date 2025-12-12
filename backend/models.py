@@ -28,4 +28,18 @@ class Note(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     file_path = Column(String, nullable=True)
     owner = relationship("User", back_populates="notes")
+    # Relationship with files
+    files = relationship("File", back_populates="note", cascade="all, delete")
+
+
+class File(Base):
+    __tablename__ = "files"
+
+    id = Column(Integer, primary_key=True, index=True)
+    note_id = Column(Integer, ForeignKey("notes.id", ondelete="CASCADE"))
+    filename = Column(String, nullable=False)
+    file_path = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    note = relationship("Note", back_populates="files")
 

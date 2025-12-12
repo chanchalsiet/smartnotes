@@ -5,3 +5,4 @@ venv
 .git
 node_modules
 test.md
+uploaded_files/
