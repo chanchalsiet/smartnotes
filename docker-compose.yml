@@ -15,13 +15,13 @@ services:
       - smartnotes_data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
       - ./backup:/backup  # for dump file
+      - ./uploaded_files:/app/uploaded_files
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 10
     restart: always
-
   backend:
     build:
       context: ./backend

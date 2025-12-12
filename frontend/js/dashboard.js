@@ -102,12 +102,14 @@ addNoteBtn.addEventListener("click", async (e) => {
     const notesText = newNoteInput.value.trim();
     if (!notesText) return;
     const token = localStorage.getItem("token");
+    alert(token)
     const user_id = localStorage.getItem("user_id");
     if (!token) {
         alert("Please login again.");
         window.location.href = "login.html";
         return;
     }
+    alert(API_URL)
     const res = await fetch(`${API_URL}/add_notes`, {
         method: "POST",
         headers: {

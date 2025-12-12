@@ -23,7 +23,7 @@ origins = [
     "http://13.58.138.43:8000",
     "*"
 ]
-
+UPLOAD_FOLDER = "uploaded_files"
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -146,9 +146,7 @@ def add_notes(
     user_id: int = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
-
     return crud.create_note(db, note, user_id)
-
 
 @app.post("/api/edit_notes/{notes_id}")
 def edit_notes(notes_id: int, note: UpdateNotes, db: Session = Depends(get_db)):

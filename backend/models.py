@@ -26,6 +26,5 @@ class Note(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
-
     owner = relationship("User", back_populates="notes")
 
