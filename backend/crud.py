@@ -60,22 +60,15 @@ def get_all_users(db: Session):
     return db.query(models.User).all()
 
 
-def create_note(db: Session, notes_text: str, user_id: int, file_paths: List[str] = None):
-    note = models.Note(notes=notes_text, user_id=user_id, has_files=bool(file_paths))
+def create_note(db: Session, notes_text: str, user_id: int):
+    note = models.Note(
+        notes=notes_text,
+        user_id=user_id
+    )
     db.add(note)
     db.commit()
     db.refresh(note)
-
-    # Create files
-    if file_paths:
-        for path in file_paths:
-            file = models.File(note_id=note.id, filename=path.split("/")[-1], file_path=path)
-            db.add(file)
-        db.commit()
-
-    db.refresh(note)
     return note
-
 
 def update_notes(db: Session, notes_id: int, note_data: schemas.UpdateNotes):
     db_note = db.query(models.Note).filter(models.Note.id == notes_id).first()

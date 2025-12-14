@@ -52,8 +52,6 @@ function editNote(noteId) {
     }
     const newContent = prompt("Edit your note:", noteToEdit.notes);
     if (newContent === null) return; // User cancelled
-    const newFile = document.createElement("input");
-    newFile.type = "file";
     noteToEdit.notes = newContent;
     renderNotes();
     const token = localStorage.getItem("token");
@@ -99,45 +97,84 @@ window.editNote = editNote;
 window.deleteNote = deleteNote;
 
 // ------- Add Note (SAVE IN DB) -------- //
+//addNoteBtn.addEventListener("click", async (e) => {
+//    e.preventDefault();
+//    const notesText = newNoteInput.value.trim();
+//    if (!notesText) return;
+//    const token = localStorage.getItem("token");
+//    const user_id = localStorage.getItem("user_id");
+//    if (!token) {
+//        alert("Please login again.");
+//        window.location.href = "login.html";
+//        return;
+//    }
+//    try {
+//        const res = await fetch(`${API_URL}/add_notes`, {
+//            method: "POST",
+//            headers: {
+//                "Authorization": `Bearer ${token}` // Do NOT set Content-Type; browser will set it
+//            },
+//            body: formData
+//        });
+//        if (res.status === 401) {
+//            alert("Session expired. Login again.");
+//            return;
+//        }
+//        const data = await res.json();
+//        notes.push(data);
+//        renderNotes();
+//        newNoteInput.value = "";
+//    } catch (error) {
+//        console.error("Error adding note:", error);
+//    }
+//    newNoteInput.value = "";
+//    renderNotes();
+//});
 addNoteBtn.addEventListener("click", async (e) => {
     e.preventDefault();
+
     const notesText = newNoteInput.value.trim();
     if (!notesText) return;
+
     const token = localStorage.getItem("token");
-    const user_id = localStorage.getItem("user_id");
     if (!token) {
         alert("Please login again.");
         window.location.href = "login.html";
         return;
     }
-    const formData = new FormData();
-    formData.append("notes", notesText);
-    if (fileInput.files.length > 0) {
-        formData.append("file", fileInput.files[0]);
-    }
+
     try {
         const res = await fetch(`${API_URL}/add_notes`, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${token}` // Do NOT set Content-Type; browser will set it
+                "Content-Type": "application/json",   // ✅ JSON
+                "Authorization": `Bearer ${token}`
             },
-            body: formData
+            body: JSON.stringify({
+                notes: notesText                     // ✅ key matches backend
+            })
         });
+
         if (res.status === 401) {
             alert("Session expired. Login again.");
             return;
         }
+
+        if (!res.ok) {
+            throw new Error("Failed to add note");
+        }
+
         const data = await res.json();
         notes.push(data);
         renderNotes();
         newNoteInput.value = "";
-        fileInput.value = "";
+
     } catch (error) {
         console.error("Error adding note:", error);
+        alert("Failed to add note");
     }
-    newNoteInput.value = "";
-    renderNotes();
 });
+
 
 // ------- Load Notes on Page Load -------- //
 async function loadNotes() {

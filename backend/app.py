@@ -144,44 +144,13 @@ def get_all_user(db: Session = Depends(get_db)):
     return {"status": "success", "users": users}
 
 
-# @app.post("/api/add_notes")
-# def add_notes(
-#     note: NoteCreate,
-#     user_id: int = Depends(auth.get_current_user),
-#     db: Session = Depends(get_db)
-# ):
-#     return crud.create_note(db, note, user_id)
-
 @app.post("/api/add_notes")
 def add_notes(
-    notes: str = Form(...),  # required note text
-    files: list[UploadFile] = File(None),  # optional file upload
+    note: NoteCreate,
     user_id: int = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
-    db_note = models.Note(notes=notes, user_id=user_id)
-    db.add(db_note)
-    db.commit()
-    db.refresh(db_note)
-
-    # 2. Save multiple files
-    if files:
-        for file in files:
-            filename = f"{user_id}_{db_note.id}_{file.filename}"
-            file_path = os.path.join(UPLOAD_DIR, filename)
-
-            with open(file_path, "wb") as f:
-                shutil.copyfileobj(file.file, f)
-
-            # Save file info in a separate table
-            db_file = models.File(note_id=db_note.id, filename=file.filename, file_path=file_path)
-            db.add(db_file)
-
-        db_note.has_files = True  # mark note as having files
-        db.commit()
-
-    db.refresh(db_note)
-    return {"note": db_note.id, "files_uploaded": [f.filename for f in files] if files else []}
+    return crud.create_note(db, note.notes, user_id)
 
 @app.post("/api/edit_notes/{notes_id}")
 def edit_notes(notes_id: int, note: UpdateNotes, db: Session = Depends(get_db)):
